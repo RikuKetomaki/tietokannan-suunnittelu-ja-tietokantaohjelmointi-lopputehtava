@@ -10,11 +10,6 @@ try {
     $stmt->execute();
     $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    // $sql = "select Composer from tracks inner join playlist_track on tracks.TrackId=playlist_track.TrackId inner join playlists on playlist_track.PlaylistId=playlists.PlaylistId where playlists.PlaylistId = $playlist_id";
-    // $stmt = $database->prepare($sql);
-    // $stmt->execute();
-    // $composer = $stmt->fetch(PDO::FETCH_ASSOC);
-
     // header('HTTP/1.1 200 OK');
     
     foreach ($rows as $row) {
