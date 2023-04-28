@@ -1,4 +1,5 @@
 <?php
+//  Riku Ketomäki
 require_once './functions.php';
 require_once './headers.php';
 
