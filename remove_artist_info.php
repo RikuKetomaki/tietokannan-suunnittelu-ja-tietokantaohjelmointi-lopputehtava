@@ -8,25 +8,27 @@ try {
 
     $database->beginTransaction();
 
-    $artist_id = 4;
+    $artist_id = 8;
 
-    $sql = "delete from playlist_track where TrackId = any (select TrackId from tracks where AlbumId = any (select AlbumId from albums where ArtistId = $artist_id))";
+    $safe_artist_id = strip_tags($artist_id);
+
+    $sql = "delete from playlist_track where TrackId = any (select TrackId from tracks where AlbumId = any (select AlbumId from albums where ArtistId = $safe_artist_id))";
     $stmt = $database->prepare($sql);
     $stmt->execute();
 
-    $sql = "delete from invoice_items where TrackId = any (select TrackId from tracks where AlbumId = any (select AlbumId from albums where ArtistId = $artist_id))";
+    $sql = "delete from invoice_items where TrackId = any (select TrackId from tracks where AlbumId = any (select AlbumId from albums where ArtistId = $safe_artist_id))";
     $stmt = $database->prepare($sql);
     $stmt->execute();
 
-    $sql = "delete from tracks where AlbumId = any (select AlbumId from albums where ArtistId = $artist_id)";
+    $sql = "delete from tracks where AlbumId = any (select AlbumId from albums where ArtistId = $safe_artist_id)";
     $stmt = $database->prepare($sql);
     $stmt->execute();
 
-    $sql = "delete from albums where ArtistId = $artist_id";
+    $sql = "delete from albums where ArtistId = $safe_artist_id";
     $stmt = $database->prepare($sql);
     $stmt->execute();
 
-    $sql = "delete from artists where ArtistId = $artist_id";
+    $sql = "delete from artists where ArtistId = $safe_artist_id";
     $stmt = $database->prepare($sql);
     $stmt->execute();
 
