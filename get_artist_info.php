@@ -8,42 +8,50 @@ try {
 
     $artist_id = 11;
 
-    // $database = openDatabase();
-    // $sql = "select artists.Name, albums.Title, tracks.Name from artists inner join albums on artists.ArtistId=albums.ArtistId inner join tracks on albums.AlbumId=tracks.AlbumId where tracks.AlbumId = any (select albums.AlbumId from albums where albums.ArtistId = any (select artists.ArtistId from artists where ArtistId = $artist_id))";
-    // $stmt = $database->prepare($sql);
-    // $stmt->execute();
-    // $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $safe_artist_id = strip_tags($artist_id);
 
-    $artist_info = array();
+    $sql = "select Name as artist from artists where ArtistId = $safe_artist_id";
+    $stmt = $database->prepare($sql);
+    $stmt->execute();
+    $name = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    $sql = "select albums.Title as title, tracks.Name as track from artists inner join albums on artists.ArtistId=albums.ArtistId inner join tracks on albums.AlbumId=tracks.AlbumId where tracks.AlbumId = any (select albums.AlbumId from albums where albums.ArtistId = any (select artists.ArtistId from artists where ArtistId = $safe_artist_id))";
+    $stmt = $database->prepare($sql);
+    $stmt->execute();
+    $albumsAndTitles = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+
+    $artist_name = implode(',', array_column($name, 'artist'));
+
     $albums = array();
+    
+    foreach ($albumsAndTitles as $row) {
+        $album_title = $row['title'];
+        $track_title = $row['track'];
+    
+        $album_index = null;
+        foreach ($albums as $index => $album) {
+            if ($album['Title'] === $album_title) {
+                $album_index = $index;
+                break;
+            }
+        }
+    
+        if ($album_index === null) {
+            $album_index = count($albums);
+            $albums[$album_index] = [
+                'Title' => $album_title,
+                'Tracks' => []
+            ];
+        }
+    
+        $albums[$album_index]['Tracks'][] = $track_title;
+    }
 
-    $artist = new stdClass();
+    $data['Artist'] = $artist_name;
+    $data['Albums'] = $albums;
 
-    $sql = "select Name from artists where ArtistId = $artist_id";
-    $stmt = $database->prepare($sql);
-    $stmt->execute();
-    $name = $stmt->fetch(PDO::FETCH_ASSOC);
-
-    $sql = "select Title from albums where ArtistId = $artist_id";
-    $stmt = $database->prepare($sql);
-    $stmt->execute();
-    $title = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-    $sql = "select Name, Title from tracks inner join albums on tracks.AlbumId=albums.AlbumId where tracks.AlbumId = any (select albums.AlbumId from albums where ArtistId = 11) ";
-    $stmt = $database->prepare($sql);
-    $stmt->execute();
-    $albums = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-
-
-    $artist->Artist = $name;
-    $artist->Albums = $albums;
-
-
-
-    $artist_info[] = $artist;
-
-    $json = json_encode($artist_info);
+    $json = json_encode($data);
 
     header('Content-Type: application/json');
     echo $json;
