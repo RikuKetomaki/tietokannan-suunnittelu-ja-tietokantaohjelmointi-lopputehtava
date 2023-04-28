@@ -9,28 +9,31 @@ try {
 
     $database->beginTransaction();
 
-    $artist_id = 8;
+    $artist_id = 9;
 
-    $safe_artist_id = strip_tags($artist_id);
-
-    $sql = "delete from playlist_track where TrackId = any (select TrackId from tracks where AlbumId = any (select AlbumId from albums where ArtistId = $safe_artist_id))";
+    $sql = "delete from playlist_track where TrackId = any (select TrackId from tracks where AlbumId = any (select AlbumId from albums where ArtistId = :artistId))";
     $stmt = $database->prepare($sql);
+    $stmt->bindParam(":artistId", $artist_id);
     $stmt->execute();
 
-    $sql = "delete from invoice_items where TrackId = any (select TrackId from tracks where AlbumId = any (select AlbumId from albums where ArtistId = $safe_artist_id))";
+    $sql = "delete from invoice_items where TrackId = any (select TrackId from tracks where AlbumId = any (select AlbumId from albums where ArtistId = :artistId))";
     $stmt = $database->prepare($sql);
+    $stmt->bindParam(":artistId", $artist_id);
     $stmt->execute();
 
-    $sql = "delete from tracks where AlbumId = any (select AlbumId from albums where ArtistId = $safe_artist_id)";
+    $sql = "delete from tracks where AlbumId = any (select AlbumId from albums where ArtistId = :artistId)";
     $stmt = $database->prepare($sql);
+    $stmt->bindParam(":artistId", $artist_id);
     $stmt->execute();
 
-    $sql = "delete from albums where ArtistId = $safe_artist_id";
+    $sql = "delete from albums where ArtistId = :artistId";
     $stmt = $database->prepare($sql);
+    $stmt->bindParam(":artistId", $artist_id);
     $stmt->execute();
 
-    $sql = "delete from artists where ArtistId = $safe_artist_id";
+    $sql = "delete from artists where ArtistId = :artistId";
     $stmt = $database->prepare($sql);
+    $stmt->bindParam(":artistId", $artist_id);
     $stmt->execute();
 
     $sql = "delete from invoices where not exists (select InvoiceId from invoice_items where invoice_items.InvoiceId = invoices.InvoiceId)";

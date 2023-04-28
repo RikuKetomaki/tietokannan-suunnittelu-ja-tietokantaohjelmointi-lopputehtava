@@ -9,15 +9,15 @@ try {
 
     $artist_id = 11;
 
-    $safe_artist_id = strip_tags($artist_id);
-
-    $sql = "select Name as artist from artists where ArtistId = $safe_artist_id";
+    $sql = "select Name as artist from artists where ArtistId = :artistId";
     $stmt = $database->prepare($sql);
+    $stmt->bindParam(":artistId", $artist_id);
     $stmt->execute();
     $name = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    $sql = "select albums.Title as title, tracks.Name as track from artists inner join albums on artists.ArtistId=albums.ArtistId inner join tracks on albums.AlbumId=tracks.AlbumId where tracks.AlbumId = any (select albums.AlbumId from albums where albums.ArtistId = any (select artists.ArtistId from artists where ArtistId = $safe_artist_id))";
+    $sql = "select albums.Title as title, tracks.Name as track from artists inner join albums on artists.ArtistId=albums.ArtistId inner join tracks on albums.AlbumId=tracks.AlbumId where tracks.AlbumId = any (select albums.AlbumId from albums where albums.ArtistId = any (select artists.ArtistId from artists where ArtistId = :artistId))";
     $stmt = $database->prepare($sql);
+    $stmt->bindParam(":artistId", $artist_id);
     $stmt->execute();
     $albumsAndTitles = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
