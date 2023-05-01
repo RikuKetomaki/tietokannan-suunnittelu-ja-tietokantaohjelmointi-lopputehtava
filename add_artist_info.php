@@ -5,35 +5,53 @@ require_once './headers.php';
 
 $database = openDatabase();
 
+/*
+Json used:
+[   
+    {
+        "artist": "testArtist",
+        "album": "testAlbum",
+        "tracks": [
+            "testTrack1", 
+            "testTrack2",
+            "testTrack3",
+            "testTrack4"
+        ]
+    }
+]
+*/
+
 try {
 
-    $artist_name = 'testArtist';
-
-    // $body = file_get_contents("php://input");
-    // $data = json_decode($body);
-    // echo $data;
+    $body = file_get_contents("php://input");
+    $data = json_decode($body);
     
     // adds artist
-    $sql = "insert into artists (name) values (:artistName)";
+    $sql = "insert into artists (name) values (?)";
     $stmt = $database->prepare($sql);
-    $stmt->bindParam(":artistName", $artist_name);
-    $stmt->execute();
+    foreach ($data as $row) {
+    $stmt->execute(array($row->artist));
+    }
 
     $new_artist_id = $database->lastInsertId();
-    
-    echo $new_artist_id."<br>";
-    
-    $album_name = 'testAlbum';
+
 
     // adds album for artist
-    $sql = "insert into albums (Title, ArtistId) values (:albumName, $new_artist_id)";
+    $sql = "insert into albums (Title, ArtistId) values (?, ?)";
     $stmt = $database->prepare($sql);
-    $stmt->bindParam(":albumName", $album_name);
-    $stmt->execute();
+    foreach ($data as $row) {
+        $stmt->execute(array($row->album, $new_artist_id));
+    }
 
     $new_album_id = $database->lastInsertId();
 
-    echo $new_album_id;
+    $sql = "insert into tracks (Name, AlbumId, MediaTypeId, GenreId) values (?, ?, 1, 2)";
+    $stm = $database->prepare($sql);
+    $trackNum = 0;
+    foreach ($data as $row) {
+        $stmt->execute(array($row->tracks[$trackNum], $new_album_id,));
+        $trackNum = $trackNum + 1;
+    }
 
 } catch (PDOException $pdoex) {
     returnErr($pdoex);
