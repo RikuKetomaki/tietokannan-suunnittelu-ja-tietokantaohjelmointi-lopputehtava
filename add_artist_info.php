@@ -49,8 +49,10 @@ try {
     $stm = $database->prepare($sql);
     $trackNum = 0;
     foreach ($data as $row) {
-        $stmt->execute(array($row->tracks[$trackNum], $new_album_id,));
-        $trackNum = $trackNum + 1;
+        // for ($i=0; $i < $data->tracks.length; $i++) { 
+            $stmt->execute(array($row->tracks[$i], $new_album_id,));
+        //    $trackNum = $trackNum + 1;
+        // }
     }
 
 } catch (PDOException $pdoex) {
