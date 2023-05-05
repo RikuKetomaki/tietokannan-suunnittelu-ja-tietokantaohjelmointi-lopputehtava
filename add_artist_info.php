@@ -45,13 +45,16 @@ try {
 
         $new_album_id = $database->lastInsertId();
 
-        // $sql = "insert into tracks (Name, AlbumId, MediaTypeId, GenreId) values (?, ?, 1, 2)";
-        // $stm = $database->prepare($sql);
+        // adds tracks for album
+        /*
+        $sql = "insert into tracks (Name, AlbumId, MediaTypeId, GenreId) values (?, ?, 1, 2)";
+        $stm = $database->prepare($sql);
 
 
-        //     for ($i=0; $i < count($data->tracks); $i++) { 
-        //         $stmt->execute(array($row->tracks[$i], $new_album_id,));
-        //     }
+            for ($i=0; $i < count($data->tracks); $i++) { 
+                $stmt->execute(array($row->tracks[$i], $new_album_id,));
+            }
+            */
     }
     
     $database->commit();
